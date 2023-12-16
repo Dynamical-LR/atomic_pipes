@@ -1,0 +1,15 @@
+class,type_defect,importance_defect,name_defect,name_defect_rus
+0,0,0.050,no_defect,не_дефект
+1,0,0.300,attrition,потертость
+2,1,1.000,black_point,черная_точка
+3,1,1.000,crack_1,плена
+4,2,0.500,marker,маркер
+5,2,0.500,dirt,грязь
+6,3,1.000,crack_2,накол
+7,0,1.000,crack_3,н.д._накол
+8,0,1.000,ledge_1,микровыступ
+9,0,1.000,ledge_2,н.д._микровыступ
+10,3,1.000,dint,вмятина
+11,3,1.000,mech_damage,мех._повреждение
+12,3,1.000,line_defect,риска
+13,3,1.000,scratch_damage,царапина_с_волчком
