@@ -69,7 +69,8 @@ const defects_ratio = [
 ];
 
 const Page = () => (
-  <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-2 ">
+  <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-2 m-2">
+    <Col numColSpan={1} numColSpanLg={3}><Card className="p-2"><Title>Dynamical LR</Title></Card></Col>
     <Col numColSpan={1} numColSpanLg={2}>
       <DefectAreaChart />
     </Col>
