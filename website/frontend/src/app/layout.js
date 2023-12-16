@@ -12,9 +12,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div class="h-screen flex flex-col">
-          <div class='bg-gray-900 px-8 flex items-center justify-between py-4 shadow-sm text-white'> Denamycal LR </div>
-          <main class='flex-1 p-2'> {children} </main>
+        <div className="h-screen flex flex-col">
+          <div className='bg-gray-900 px-8 flex items-center justify-between py-4 shadow-sm text-white'> Denamycal LR </div>
+          <main className='flex-1 p-2'> {children} </main>
         </div>
       </body>
     </html>
