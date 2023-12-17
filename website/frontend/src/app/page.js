@@ -5,7 +5,7 @@ import CustomAnalysis from "@/components/CustomAnalysis";
 import Image from "next/image";
 
 const getStatistics = async () => {
-  const resp = await fetch("http://localhost:8080/statitistics");
+  const resp = await fetch("https://dc4d-87-116-164-65.ngrok-free.app/statitistics");
   if (!resp.ok) {
     throw new Error('Failed to fetch data')
   }
