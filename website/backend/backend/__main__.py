@@ -16,6 +16,8 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 from cryptography import fernet
 from numpy import random
 
+from backend import model
+
 routes = web.RouteTableDef()
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -25,90 +27,37 @@ IMAGES_DIR: str = "images"
 queues = defaultdict(asyncio.Queue)
 
 
-@routes.get("/predicts")
-async def predicts(request: web.Request) -> web.StreamResponse:
-    response = web.StreamResponse()
-    response.content_type = "text/plain"
-    await response.prepare(request)
-
+@routes.get("/predict/last")
+async def last_predict(request: web.Request) -> web.FileResponse:
     session = await get_session(request)
-    csv_path = f"./csv/{session['id']}.csv"
-    archive_path = f"./archives/{session['id']}.zip"
+    if not session.get("predict"):
+        session["predict"] = ["./image.png"]
 
-    while True:
-        predict = await queues[session["id"]].get()
-
-        if predict is None:
-            break
-
-        with open(csv_path, "a") as f:
-            writer = csv.writer(f)
-            writer.writerows(predict)
-
-        with zipfile.ZipFile(archive_path, "a") as zip:
-            for file, is_broken, is_empty, is_animal in predict:
-                print(file, is_broken, is_empty, is_animal)
-                base_dir = None
-                if is_broken == 1.0:
-                    print("broken")
-                    base_dir = "broken"
-                elif is_empty == 1.0:
-                    print("empty")
-                    base_dir = "empty"
-                else:
-                    print("animal")
-                    base_dir = "animal"
-
-                zip.write(f"./images/{file}", f"result/{base_dir}/{file}")
-
-        b = bytearray(json.dumps({"predict": predict}) + "\n", "utf-8")
-        await response.write(b)
-
-    return response
+    return web.FileResponse(session["predict"][-1])
 
 
-@routes.get("/predicts/csv")
-async def predicts_csv(request: web.Request) -> web.FileResponse:
-    session = await get_session(request)
-    path = f"./csv/{session['id']}.csv"
-    return web.FileResponse(path)
+@routes.get("/predict/{path}")
+async def custom_predict(request: web.Request) -> web.FileResponse:
+    path: str = request.match_info["path"]
+    return web.FileResponse(f"./predict/img/{path}")
 
 
-@routes.get("/predicts/archive")
-async def predicts_archive(request: web.Request) -> web.FileResponse:
-    session = await get_session(request)
-    path = f"./archives/{session['id']}.zip"
-    return web.FileResponse(path)
-
-
-@routes.post("/upload-images")
+@routes.post("/predict")
 async def upload_images(request: web.Request) -> web.Response:
     """
     Accepts request from `images` HTML form
     Loads all choosed files to `IMAGEX_DIR`
     """
-    session = await get_session(request)
-
     reader: MultipartReader = await request.multipart()
     paths = _download_files(reader)
-    print("Files downloaded")
 
-    model = Model("weights/dinov2_f4.pth")
-    predictions = model(paths)
+    img_path = None
+    async for path in paths:
+        img_path = model.process_image(path)
 
-    print(f"{session.identity=}")
-
-    async for predict in predictions:
-        print(f"{predict=}")
-        predict = [
-            ("/".join(list(path.split("/"))[1:]), *classes) for path, classes in predict
-        ]
-        await queues[session["id"]].put(predict)
-        session["predict"].extend(predict)
-
-    await queues[session["id"]].put(None)
-
-    return web.Response(text="OK")
+    return web.json_response(
+        {"url": f"/predict/{img_path}"}, headers={"Access-Control-Allow-Origin": "*"}
+    )
 
 
 async def _download_files(reader: MultipartReader) -> AsyncIterable[str]:
@@ -150,6 +99,9 @@ async def _download_files(reader: MultipartReader) -> AsyncIterable[str]:
 
 @routes.get("/statitistics")
 async def read_statistics(req: web.Request) -> web.Response:
+    session = await new_session(req)
+    session["id"] = random.randint(0, 100000000)
+    session["predict"] = ["./image.png"]
     return web.json_response(
         {
             "total": 6000,

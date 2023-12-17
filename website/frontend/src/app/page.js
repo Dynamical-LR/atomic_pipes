@@ -1,8 +1,8 @@
-import { Grid, Col, Card, Title, List, Flex, Text, Callout, ListItem } from "@tremor/react";
+import { Grid, Col, Card, Title, List, Text, Callout, ListItem } from "@tremor/react";
 import DefectAreaChart from "@/components/DefectAreaChart.js";
 import DefectTypesDonut from "@/components/DefectTypesDonut.js";
 import CustomAnalysis from "@/components/CustomAnalysis";
-import Image from "next/image";
+import DefectImage from "@/components/image";
 
 const getStatistics = async () => {
   const resp = await fetch("https://dc4d-87-116-164-65.ngrok-free.app/statitistics");
@@ -14,6 +14,7 @@ const getStatistics = async () => {
 }
 
 const Page = async () => {
+
   const defects = ["a", "b", "c", "d", "e"];
 
   const statistics = await getStatistics();
@@ -55,10 +56,7 @@ const Page = async () => {
     </Col>
     <Card>
       <Title className="mb-4">Последний обнаруженный дефект</Title>
-      <Image src="/image.png"
-        width={600}
-        height={900}
-      />
+      <DefectImage />
       <Callout
         className="mt-8"
         title="Вмятина"

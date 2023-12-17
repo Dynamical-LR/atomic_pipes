@@ -26,7 +26,6 @@ const DefectAreaChart = ({ chartdata }) => {
       categories={["a", "b", "c", "d", "e"]}
       showAnimation={true}
       showGradient={true}
-      className="m-auto"
       yAxisWidth={40}
       onValueChange={(v) => setChartValue(v)}
       connectNulls={true}

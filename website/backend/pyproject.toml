@@ -13,7 +13,17 @@ loguru = "^0.7.2"
 aiohttp-session = "^2.12.0"
 cryptography = "^41.0.7"
 numpy = "^1.26.2"
+torch = {version = "^2.1.2+cpu", source = "pytorch-cpu"}
+torchvision = {version = "^0.16.2+cpu", source = "pytorch-cpu"}
+torchaudio = {version = "^2.1.2+cpu", source = "pytorch-cpu"}
+pillow = "^10.1.0"
+ultralytics = "^8.0.227"
 
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [build-system]
 requires = ["poetry-core"]
