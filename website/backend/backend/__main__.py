@@ -39,7 +39,7 @@ async def last_predict(request: web.Request) -> web.FileResponse:
 @routes.get("/predict/{path}")
 async def custom_predict(request: web.Request) -> web.FileResponse:
     path: str = request.match_info["path"]
-    return web.FileResponse(f"./predict/img/{path}")
+    return web.FileResponse(f"./predict/{path}")
 
 
 @routes.post("/predict")
