@@ -11,6 +11,7 @@ const DefectTypesDonut = ({ data, colors }) => (
     index="name"
     valueFormatter={valueFormatter}
     colors={colors}
+    showAnimation={true}
   />
 );
 

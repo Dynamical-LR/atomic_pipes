@@ -1,50 +1,37 @@
 "use client";
-import { AreaChart, Card, Title } from "@tremor/react";
+import { AreaChart, Card, Title, DateRangePicker, Flex, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
+import { useState } from "react";
 
-const chartdata = [
-  {
-    date: "Jan 22",
-    "Defects count": 2890,
-  },
-  {
-    date: "Feb 22",
-    "Defects count": 2756,
-  },
-  {
-    date: "Mar 22",
-    "Defects count": 3322,
-  },
-  {
-    date: "Apr 22",
-    "Defects count": 3470,
-  },
-  {
-    date: "May 22",
-    "Defects count": 3475,
-  },
-  {
-    date: "Jun 22",
-    "Defects count": 3129,
-  },
-];
+const DefectAreaChart = ({ chartdata }) => {
+  const [value, setValue] = useState({
+    from: new Date(2023, 10, 17),
+    to: new Date(),
+  });
 
-const valueFormatter = function(number) {
-  // return "$ " + new Intl.NumberFormat("us").format(number).toString();
-  return number;
-};
+  const [chartValue, setChartValue] = useState(null);
 
-const DefectAreaChart = () => (
-  <Card>
-    <Title>General</Title>
+  return <Card>
+    <Flex flexDirection="col" alignItems="start" className="mt-6">
+      <DateRangePicker
+        className="ml-0 mr-4"
+        value={value}
+        onValueChange={setValue}
+        color="rose"
+      >
+      </DateRangePicker>
+    </Flex>
     <AreaChart
-      className="h-72 mt-4"
       data={chartdata}
-      index="date"
-      categories={["Defects count"]}
-      colors={["indigo"]}
-      valueFormatter={valueFormatter}
+      index={"day"}
+      categories={["a", "b", "c", "d", "e"]}
+      showAnimation={true}
+      showGradient={true}
+      className="m-auto"
+      yAxisWidth={40}
+      onValueChange={(v) => setChartValue(v)}
+      connectNulls={true}
     />
   </Card>
-);
+};
 
 export default DefectAreaChart;

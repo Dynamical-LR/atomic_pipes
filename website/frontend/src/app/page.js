@@ -1,103 +1,87 @@
-import { Grid, Col, Card, Title, List, ListItem } from "@tremor/react";
+import { Grid, Col, Card, Title, List, Flex, Text, Callout, ListItem } from "@tremor/react";
 import DefectAreaChart from "@/components/DefectAreaChart.js";
 import DefectTypesDonut from "@/components/DefectTypesDonut.js";
 import CustomAnalysis from "@/components/CustomAnalysis";
+import Image from "next/image";
 
-const cities = [
-  {
-    name: "New York",
-    count: 9800,
-  },
-  {
-    name: "London",
-    count: 4567,
-  },
-  {
-    name: "Hong Kong",
-    count: 3908,
-  },
-  {
-    name: "San Francisco",
-    count: 2400,
-  },
-  {
-    name: "Singapore",
-    count: 1908,
-  },
-  {
-    name: "Zurich",
-    count: 1398,
-  },
-];
+const getStatistics = async () => {
+  const resp = await fetch("http://localhost:8080/statitistics");
+  if (!resp.ok) {
+    throw new Error('Failed to fetch data')
+  }
 
-const statisitcs = [
-  {
-    city: "Athens",
-    rating: "2 open PR",
-  },
-  {
-    city: "Luzern",
-    rating: "1 open PR",
-  },
-  {
-    city: "Zürich",
-    rating: "0 open PR",
-  },
-  {
-    city: "Vienna",
-    rating: "1 open PR",
-  },
-  {
-    city: "Ermatingen",
-    rating: "0 open PR",
-  },
-  {
-    city: "Lisbon",
-    rating: "0 open PR",
-  },
-];
+  return resp.json()
+}
 
-const defects_ratio = [
-  {
-    name: "valid",
-    count: 5000,
-  },
-  {
-    name: "defect",
-    count: 1000,
-  },
-];
+const Page = async () => {
+  const defects = ["a", "b", "c", "d", "e"];
 
-const Page = () => (
-  <Grid numItems={1} numItemsSm={2} numItemsLg={3} className="gap-2 m-2">
-    <Col numColSpan={1} numColSpanLg={3}><Card className="p-2"><Title>Dynamical LR</Title></Card></Col>
-    <Col numColSpan={1} numColSpanLg={2}>
-      <DefectAreaChart />
-    </Col>
-    <Card>
-      <Title>Statistics</Title>
-      <List>
-        {statisitcs.map((item) => (
-          <ListItem key={item.city}>
-            <span>{item.city}</span>
-            <span>{item.rating}</span>
-          </ListItem>
-        ))}
-      </List>
+  const statistics = await getStatistics();
+  const total_defects_count = statistics["detects"].reduce((acc, detect) => acc + detect["defects"].reduce((acc, i) => acc + i, 0), 0)
+  const defects_ratio = [
+    {
+      name: "valid",
+      count: statistics["total"] - total_defects_count,
+    },
+    {
+      name: "defect",
+      count: total_defects_count,
+    },
+  ];
+  const defects_counts = [0, 0, 0, 0, 0];
 
-    </Card>
-    <Col>
+  for (let detect of statistics["detects"]) {
+    for (let i = 0; i < defects_counts.length; i++) {
+      defects_counts[i] += detect["defects"][i];
+    }
+  }
+
+  const defect2count = [];
+
+  for (const [idx, cnt] of defects_counts.entries()) {
+    defect2count.push({ "name": defects[idx], "count": cnt });
+  }
+
+  return <Grid numItems={1} numItemsSm={2} numItemsLg={4} className="gap-2 m-2">
+    <Col numColSpan={1} numColSpanLg={4}>
       <Card>
-        <Title>Total defects count ratio</Title>
-        <DefectTypesDonut data={defects_ratio} colors={["slate", "red"]} />
+        <Title>
+          Dynamical LR
+        </Title>
       </Card>
     </Col>
+    <Col numColSpan={1} numColSpanLg={3}>
+      <DefectAreaChart chartdata={statistics["detects"].map(d => ({ day: d["day"], a: d["defects"][0], b: d["defects"][1], c: d["defects"][2], d: d["defects"][3], e: d["defects"][4] }))} />
+    </Col>
     <Card>
-      <Title>Defect types</Title>
-      <DefectTypesDonut data={cities} colors={["slate", "violet", "indigo", "rose", "cyan", "amber"]} />
+      <Title className="mb-4">Последний обнаруженный дефект</Title>
+      <Image src="/image.png"
+        width={600}
+        height={900}
+      />
+      <Callout
+        className="mt-8"
+        title="Вмятина"
+        color="teal">
+        19:30 17.12.2023
+      </Callout>
+    </Card>
+    <Card className="pt-0">
+      <DefectTypesDonut data={defects_ratio} colors={["slate", "red"]} />
+      <Text className="mt-4">Количество дефектов среди проанализированных фото</Text>
+    </Card>
+    <Card className="pt-0">
+      <DefectTypesDonut data={defect2count} />
+      <Text className="mt-4">Количественное отношение дефектов</Text>
+    </Card>
+    <Card>
+      <Title>Общая статистика</Title>
+      <List>
+        <ListItem></ListItem>
+      </List>
     </Card>
     <CustomAnalysis />
   </Grid>
-);
+};
 
 export default Page;
